@@ -37,15 +37,6 @@
     <ApplicationIcon>Resources\1384206239_40096.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Messages">
-      <HintPath>..\..\..\..\APPS\Download\Nito.Async.1.4\Source\Examples\Sockets\Messages\bin\Debug\Messages.dll</HintPath>
-    </Reference>
-    <Reference Include="Nito.Async">
-      <HintPath>..\..\..\..\APPS\Download\Nito.Async.1.4\Source\Nito.Async\bin\Debug\Nito.Async.dll</HintPath>
-    </Reference>
-    <Reference Include="Nito.Async.Sockets">
-      <HintPath>..\..\..\..\APPS\Download\Nito.Async.1.4\Source\Nito.Async.Sockets\bin\Debug\Nito.Async.Sockets.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net" />
@@ -120,6 +111,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\1384206239_40096.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Nito.Async.Sockets\Nito.Async.Sockets.csproj">
+      <Project>{b412b766-bec2-407c-a7a1-0e5257511515}</Project>
+      <Name>Nito.Async.Sockets</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Nito.Async\Nito.Async.csproj">
+      <Project>{708763ed-7801-4f2c-b103-4febd771769a}</Project>
+      <Name>Nito.Async</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

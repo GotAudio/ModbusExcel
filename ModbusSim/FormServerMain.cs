@@ -534,24 +534,26 @@ namespace ModbusSim
 
         private void SetCheck(int connection, string setVal)
         {
+            if (!checkbox_showevents.Checked) return;
+
             var i = connection % 30;
             var j = (connection - i) / 31;
 
-           // textBoxLog.AppendText("Connecting: [" + (i+1).ToString() + "][" + (j+1).ToString() + "]" + Environment.NewLine);
+            // textBoxLog.AppendText("Connecting: [" + (i+1).ToString() + "][" + (j+1).ToString() + "]" + Environment.NewLine);
 
-            var toffscreenBitMap = _offscreenBitMap; 
+            var toffscreenBitMap = _offscreenBitMap;
             Graphics offscreenGraphics = Graphics.FromImage(toffscreenBitMap);
             Graphics clientDc = panel1.CreateGraphics();
 
             int wo = i < 9 ? i * 21 : 9 * 21 + 2 + (i - 9) * 25;
 
             if (setVal == "CheckedRead")
-                    Checkboxes[connection] = Checkboxes[connection] == 1 ? 2 : 1;
+                Checkboxes[connection] = Checkboxes[connection] == 1 ? 2 : 1;
             else
                 if (setVal == "IndeterminateRead")
                     Checkboxes[connection] = Checkboxes[connection] == 1 ? 1 : 2;
 
-            var newval = GetCheckbox(setVal, i % 2, Checkboxes[connection] % 2==1);
+            var newval = GetCheckbox(setVal, i % 2, Checkboxes[connection] % 2 == 1);
 
             offscreenGraphics.DrawImage(newval, (wo) + 47, (j * 18) + 20);
             _offscreenBitMap = toffscreenBitMap;
@@ -610,15 +612,27 @@ namespace ModbusSim
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
+            var start = DateTime.Now;
+
             //Random r = new Random();
-            for (int j = 0; j < 960; j++) SetCheck(j, "Checked");
-            for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");
-            for (int j = 0; j < 960; j++) SetCheck(j, "CheckedRead");
-            for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");
-            for (int j = 0; j < 960; j++) SetCheck(j, "Indeterminate");
-            for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");
-            for (int j = 0; j < 960; j++) SetCheck(j, "IndeterminateRead");
-            for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");
+            for (int i = 0; i < 57; i++)
+            {
+                for (int j = 0; j < 960; j++) SetCheck(j, "Checked");
+                for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");                
+            }
+            var stop = DateTime.Now;
+            TimeSpan span = stop.Subtract(start);
+            double sec = span.TotalSeconds;
+            textBoxLog.AppendText(string.Format("Toggled 109,440 checkboxes in {0} seconds. At 110K reads per minute, GUI is {1:0.#}% of overhead." + Environment.NewLine, sec, (sec * 100 / 60)));
+            return;
+            //for (int j = 0; j < 960; j++) SetCheck(j, "Checked");
+            //for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");
+            //for (int j = 0; j < 960; j++) SetCheck(j, "CheckedRead");
+            //for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");
+            //for (int j = 0; j < 960; j++) SetCheck(j, "Indeterminate");
+            //for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");
+            //for (int j = 0; j < 960; j++) SetCheck(j, "IndeterminateRead");
+            //for (int j = 0; j < 960; j++) SetCheck(j, "UnChecked");
         }
     }
 }

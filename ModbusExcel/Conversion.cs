@@ -127,12 +127,7 @@ namespace ModbusExcel
                     break;
                 case "D": // (Debug)Raw Hexadecimal
                 case "R":
-                    StringBuilder sb = new StringBuilder(rawdata.Length * 2);
-                    foreach (byte b in rawdata)
-                    {
-                        sb.AppendFormat("{0:x2}", b);
-                    }
-                    value = sb.ToString();
+                    value = CreateHexString(rawdata);
                     break;
                 case "T": // Text
                     value = Encoding.ASCII.GetString(rawdata);
@@ -155,6 +150,25 @@ namespace ModbusExcel
         {
             var datatype = Conversion.Datatype(addr);
             return Parseresult(addr, length, rawdata, modicon, datatype);
+        }
+
+        /// <summary>
+        /// ParseResult was using up 10% of CPU time to convert byte-array to string. Found this replacement;
+        /// https://www.simple-talk.com/blogs/2010/07/17/writing-a-byte-array-to-a-hexadecimal-string
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string CreateHexString(byte[] data)
+        {
+            char[] c = new char[data.Length * 2];
+            byte b;
+            for (int y = 0, x = 0; y < data.Length; ++y, ++x)
+            {
+                b = ((byte)(data[y] >> 4)); c[x] = (char)(b > 9 ? b + 0X37 : b + 0X30);
+                b = ((byte)(data[y] & 0xF));
+                c[++x] = (char)(b > 9 ? b + 0X37 : b + 0X30);
+            }
+            return new string(c);
         }
     }
 }

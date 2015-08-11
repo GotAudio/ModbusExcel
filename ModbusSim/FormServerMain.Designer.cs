@@ -99,6 +99,7 @@ namespace ModbusSim
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.checkbox_showevents = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -153,6 +154,7 @@ namespace ModbusSim
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkbox_showevents);
             this.groupBox1.Controls.Add(this.pictureBox1);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.buttonStart);
@@ -214,6 +216,18 @@ namespace ModbusSim
             this.panel1.Size = new System.Drawing.Size(767, 585);
             this.panel1.TabIndex = 40;
             // 
+            // checkbox_showevents
+            // 
+            this.checkbox_showevents.AutoSize = true;
+            this.checkbox_showevents.Checked = true;
+            this.checkbox_showevents.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkbox_showevents.Location = new System.Drawing.Point(294, 17);
+            this.checkbox_showevents.Name = "checkbox_showevents";
+            this.checkbox_showevents.Size = new System.Drawing.Size(86, 17);
+            this.checkbox_showevents.TabIndex = 34;
+            this.checkbox_showevents.Text = "ShowEvents";
+            this.checkbox_showevents.UseVisualStyleBackColor = true;
+            // 
             // FormServerMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -250,6 +264,7 @@ namespace ModbusSim
         private ToolStripStatusLabel toolStripStatusLabel4;
         private PictureBox pictureBox1;
         private Panel panel1;
+        private CheckBox checkbox_showevents;
     }
 }
 
