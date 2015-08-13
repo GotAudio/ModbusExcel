@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModbusSim", "ModbusSim\Modb
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{6D658EE7-33E9-4370-8803-71C4AA5E6398}"
 	ProjectSection(SolutionItems) = preProject
+		Documents\ModbusExcel User Guide.docx = Documents\ModbusExcel User Guide.docx
 		Documents\ModbusExcel.PLCSimulator.xlsm = Documents\ModbusExcel.PLCSimulator.xlsm
 		Documents\ModbusExcel.ReadCoils.FormatRules.xlsm = Documents\ModbusExcel.ReadCoils.FormatRules.xlsm
 		Documents\ModbusExcel.ReadOmniConfigs.xlsm = Documents\ModbusExcel.ReadOmniConfigs.xlsm
@@ -33,6 +34,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nito.Async.Sockets", "Nito.Async.Sockets\Nito.Async.Sockets.csproj", "{B412B766-BEC2-407C-A7A1-0E5257511515}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nito.Async.UnitTests", "Nito.Async.UnitTests\Nito.Async.UnitTests.csproj", "{17FC62AB-AE14-4D2E-B838-52E8A1AD88C0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{23290D11-79B4-49C7-B39D-886BA9BEA13F}"
+	ProjectSection(SolutionItems) = preProject
+		Performance2.psess = Performance2.psess
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
