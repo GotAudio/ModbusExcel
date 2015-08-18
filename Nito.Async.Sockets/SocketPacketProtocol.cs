@@ -2,6 +2,8 @@
 //     Copyright (c) 2009 Nito Programs.
 // </copyright>
 
+using System.IO;
+
 namespace Nito.Async.Sockets
 {
     using System;
@@ -38,8 +40,8 @@ namespace Nito.Async.Sockets
         /// <param name="socket">The socket used for communication.</param>
         public SocketPacketProtocol(IAsyncTcpConnection socket)
         {
-            this.Socket = socket;
-            this.lengthBuffer = new byte[sizeof(int)];
+            Socket = socket;
+            lengthBuffer = new byte[sizeof(int)];
         }
 
         /// <summary>
@@ -106,8 +108,8 @@ namespace Nito.Async.Sockets
         /// </summary>
         public void Start()
         {
-            this.Socket.ReadCompleted += this.SocketReadCompleted;
-            this.ContinueReading();
+            Socket.ReadCompleted += SocketReadCompleted;
+            ContinueReading();
         }
 
         /// <summary>
@@ -116,13 +118,13 @@ namespace Nito.Async.Sockets
         private void ContinueReading()
         {
             // Read into the appropriate buffer: length or data
-            if (this.dataBuffer != null)
+            if (dataBuffer != null)
             {
-                this.Socket.ReadAsync(this.dataBuffer, this.bytesReceived, this.dataBuffer.Length - this.bytesReceived);
+                Socket.ReadAsync(dataBuffer, bytesReceived, dataBuffer.Length - bytesReceived);
             }
             else
             {
-                this.Socket.ReadAsync(this.lengthBuffer, this.bytesReceived, this.lengthBuffer.Length - this.bytesReceived);
+                Socket.ReadAsync(lengthBuffer, bytesReceived, lengthBuffer.Length - bytesReceived);
             }
         }
 
@@ -136,48 +138,48 @@ namespace Nito.Async.Sockets
             // Pass along read errors verbatim
             if (e.Error != null)
             {
-                if (this.PacketArrived != null)
+                if (PacketArrived != null)
                 {
-                    this.PacketArrived(new AsyncResultEventArgs<byte[]>(e.Error));
+                    PacketArrived(new AsyncResultEventArgs<byte[]>(e.Error));
                 }
 
                 return;
             }
 
             // Get the number of bytes read into the buffer
-            this.bytesReceived += e.Result;
+            bytesReceived += e.Result;
 
             // If we get a zero-length read, then that indicates the remote side graciously closed the connection
             if (e.Result == 0)
             {
-                if (this.PacketArrived != null)
+                if (PacketArrived != null)
                 {
-                    this.PacketArrived(new AsyncResultEventArgs<byte[]>((byte[])null));
+                    PacketArrived(new AsyncResultEventArgs<byte[]>((byte[])null));
                 }
 
                 return;
             }
 
-            if (this.dataBuffer == null)
+            if (dataBuffer == null)
             {
                 // (We're currently receiving the length buffer)
-                if (this.bytesReceived != sizeof(int))
+                if (bytesReceived != sizeof(int))
                 {
                     // We haven't gotten all the length buffer yet
-                    this.ContinueReading();
+                    ContinueReading();
                 }
                 else
                 {
                     // We've gotten the length buffer
-                    int length = BitConverter.ToInt32(this.lengthBuffer, 0);
+                    int length = BitConverter.ToInt32(lengthBuffer, 0);
 
                     // Sanity check for length < 0
                     //  This check will catch 50% of transmission errors that make it past both the IP and Ethernet checksums
                     if (length < 0)
                     {
-                        if (this.PacketArrived != null)
+                        if (PacketArrived != null)
                         {
-                            this.PacketArrived(new AsyncResultEventArgs<byte[]>(new System.IO.InvalidDataException("Packet length less than zero (corrupted message)")));
+                            PacketArrived(new AsyncResultEventArgs<byte[]>(new InvalidDataException("Packet length less than zero (corrupted message)")));
                         }
 
                         return;
@@ -186,37 +188,37 @@ namespace Nito.Async.Sockets
                     // Zero-length packets are allowed as keepalives
                     if (length == 0)
                     {
-                        this.bytesReceived = 0;
-                        this.ContinueReading();
+                        bytesReceived = 0;
+                        ContinueReading();
                     }
                     else
                     {
                         // Create the data buffer and start reading into it
-                        this.dataBuffer = new byte[length];
-                        this.bytesReceived = 0;
-                        this.ContinueReading();
+                        dataBuffer = new byte[length];
+                        bytesReceived = 0;
+                        ContinueReading();
                     }
                 }
             }
             else
             {
-                if (this.bytesReceived != this.dataBuffer.Length)
+                if (bytesReceived != dataBuffer.Length)
                 {
                     // We haven't gotten all the data buffer yet
-                    this.ContinueReading();
+                    ContinueReading();
                 }
                 else
                 {
                     // We've gotten an entire packet
-                    if (this.PacketArrived != null)
+                    if (PacketArrived != null)
                     {
-                        this.PacketArrived(new AsyncResultEventArgs<byte[]>(this.dataBuffer));
+                        PacketArrived(new AsyncResultEventArgs<byte[]>(dataBuffer));
                     }
 
                     // Start reading the length buffer again
-                    this.dataBuffer = null;
-                    this.bytesReceived = 0;
-                    this.ContinueReading();
+                    dataBuffer = null;
+                    bytesReceived = 0;
+                    ContinueReading();
                 }
             }
         }

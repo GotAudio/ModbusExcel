@@ -20,7 +20,7 @@ namespace Nito.Async
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.ControlEvidence | SecurityPermissionFlag.ControlPolicy)]
         public ScopedSynchronizationContext(SynchronizationContext replacementContext)
         {
-            this.PreviousContext = SynchronizationContext.Current;
+            PreviousContext = SynchronizationContext.Current;
             SynchronizationContext.SetSynchronizationContext(replacementContext);
         }
 
@@ -34,7 +34,7 @@ namespace Nito.Async
         /// </summary>
         public void Dispose()
         {
-            SynchronizationContext.SetSynchronizationContext(this.PreviousContext);
+            SynchronizationContext.SetSynchronizationContext(PreviousContext);
         }
     }
 }

@@ -56,8 +56,8 @@ namespace Nito.Async
         /// </example>
         public ActionDispatcher()
         {
-            this.actionQueueNotEmptyEvent = new ManualResetEvent(false);
-            this.actionQueue = new Queue<Action>();
+            actionQueueNotEmptyEvent = new ManualResetEvent(false);
+            actionQueue = new Queue<Action>();
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Nito.Async
         /// </example>
         public void Dispose()
         {
-            this.actionQueueNotEmptyEvent.Close();
+            actionQueueNotEmptyEvent.Close();
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Nito.Async
                 while (true)
                 {
                     // Dequeue and run an action
-                    this.DequeueAction()();
+                    DequeueAction()();
                 }
             }
             catch (ExitException)
@@ -143,15 +143,15 @@ namespace Nito.Async
         /// </example>
         public void QueueAction(Action action)
         {
-            lock (this.actionQueue)
+            lock (actionQueue)
             {
                 // Add the action to the action queue
-                this.actionQueue.Enqueue(action);
+                actionQueue.Enqueue(action);
 
                 // Set the signal if necessary
-                if (this.actionQueue.Count == 1)
+                if (actionQueue.Count == 1)
                 {
-                    this.actionQueueNotEmptyEvent.Set();
+                    actionQueueNotEmptyEvent.Set();
                 }
             }
         }
@@ -169,7 +169,7 @@ namespace Nito.Async
         /// </example>
         public void QueueExit()
         {
-            this.QueueAction(() => { throw new ExitException(); });
+            QueueAction(() => { throw new ExitException(); });
         }
 
         /// <summary>
@@ -179,19 +179,19 @@ namespace Nito.Async
         private Action DequeueAction()
         {
             // Wait for an action to arrive
-            this.actionQueueNotEmptyEvent.WaitOne();
+            actionQueueNotEmptyEvent.WaitOne();
 
             Action ret;
 
-            lock (this.actionQueue)
+            lock (actionQueue)
             {
                 // Remove an action from the action queue
-                ret = this.actionQueue.Dequeue();
+                ret = actionQueue.Dequeue();
 
                 // Reset the signal if necessary
-                if (this.actionQueue.Count == 0)
+                if (actionQueue.Count == 0)
                 {
-                    this.actionQueueNotEmptyEvent.Reset();
+                    actionQueueNotEmptyEvent.Reset();
                 }
             }
 

@@ -148,7 +148,7 @@ namespace ModbusExcel
         /// <returns>String. Multiple values will be delimited by "|"</returns>
         public static string Parseresult(ushort addr, byte length, byte[] rawdata, string modicon)
         {
-            var datatype = Conversion.Datatype(addr);
+            var datatype = Datatype(addr);
             return Parseresult(addr, length, rawdata, modicon, datatype);
         }
 

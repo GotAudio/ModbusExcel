@@ -42,7 +42,7 @@ namespace Nito.Async
         /// </summary>
         public bool Invalidated
         {
-            get { return this.context == null; }
+            get { return context == null; }
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Nito.Async
         /// </remarks>
         public void Reset()
         {
-            this.context = null;
+            context = null;
         }
 
         /// <summary>
@@ -71,18 +71,18 @@ namespace Nito.Async
         public Action Bind(Action action)
         {
             // Create the object-context if it doesn't already exist.
-            if (this.context == null)
+            if (context == null)
             {
-                this.context = new object();
+                context = new object();
             }
 
             // Make a (reference) copy of the current object-context; this is necessary because lambda expressions bind to variables, not values
-            object boundContext = this.context;
+            object boundContext = context;
             return () =>
                 {
                     // Compare the bound object-context to the current object-context; if they differ, then do nothing
                     // Use the static object.Equals instead of the instance object.Equals because the current object-context may be null
-                    if (object.Equals(boundContext, this.context))
+                    if (Equals(boundContext, context))
                     {
                         action();
                     }
@@ -105,18 +105,18 @@ namespace Nito.Async
         public Func<T> Bind<T>(Func<T> func)
         {
             // Create the object-context if it doesn't already exist.
-            if (this.context == null)
+            if (context == null)
             {
-                this.context = new object();
+                context = new object();
             }
 
             // Make a (reference) copy of the current object-context; this is necessary because lambda expressions bind to variables, not values
-            object boundContext = this.context;
+            object boundContext = context;
             return () =>
                 {
                     // Compare the bound object-context to the current object-context; if they differ, then do nothing
                     // Use the static object.Equals instead of the instance object.Equals because the current object-context may be null
-                    if (object.Equals(boundContext, this.context))
+                    if (Equals(boundContext, context))
                     {
                         return func();
                     }
@@ -141,7 +141,7 @@ namespace Nito.Async
         public Action Bind(Action action, ISynchronizeInvoke synchronizingObject)
         {
             // Create the bound delegate
-            Action boundAction = this.Bind(action);
+            Action boundAction = Bind(action);
 
             // Return a synchronized wrapper for the bound delegate
             return () =>
@@ -173,7 +173,7 @@ namespace Nito.Async
         /// </threadsafety>
         public Action Bind(Action action, SynchronizationContext synchronizationContext)
         {
-            return this.Bind(action, synchronizationContext, true);
+            return Bind(action, synchronizationContext, true);
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace Nito.Async
             }
 
             // Create the bound delegate
-            Action boundAction = this.Bind(action);
+            Action boundAction = Bind(action);
 
             // Return a synchronized wrapper for the bound delegate
             return () =>
@@ -225,7 +225,7 @@ namespace Nito.Async
         public Func<T> Bind<T>(Func<T> func, ISynchronizeInvoke synchronizingObject)
         {
             // Create the bound delegate
-            Func<T> boundFunc = this.Bind(func);
+            Func<T> boundFunc = Bind(func);
 
             // Return a synchronized wrapper for the bound delegate
             return () =>
@@ -257,7 +257,7 @@ namespace Nito.Async
         /// </threadsafety>
         public Func<T> Bind<T>(Func<T> func, SynchronizationContext synchronizationContext)
         {
-            return this.Bind(func, synchronizationContext, true);
+            return Bind(func, synchronizationContext, true);
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace Nito.Async
             }
 
             // Create the bound delegate
-            Func<T> boundFunc = this.Bind(func);
+            Func<T> boundFunc = Bind(func);
 
             // Return a synchronized wrapper for the bound delegate
             return () =>
@@ -310,7 +310,7 @@ namespace Nito.Async
         /// </threadsafety>
         public Action AsyncBind(Action action, SynchronizationContext synchronizationContext)
         {
-            return this.AsyncBind(action, synchronizationContext, true);
+            return AsyncBind(action, synchronizationContext, true);
         }
 
         /// <summary>
@@ -336,7 +336,7 @@ namespace Nito.Async
             }
 
             // Create the bound delegate
-            Action boundAction = this.Bind(action);
+            Action boundAction = Bind(action);
 
             // Return a synchronized wrapper for the bound delegate
             return () =>
@@ -353,7 +353,7 @@ namespace Nito.Async
         /// </remarks>
         public void Dispose()
         {
-            this.Reset();
+            Reset();
         }
     }
 }

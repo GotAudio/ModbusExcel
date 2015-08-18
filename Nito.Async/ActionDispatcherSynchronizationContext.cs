@@ -29,7 +29,7 @@ namespace Nito.Async
         /// <param name="actionDispatcher">The action queue to associate with this <see cref="ActionDispatcherSynchronizationContext"/>.</param>
         public ActionDispatcherSynchronizationContext(ActionDispatcher actionDispatcher)
         {
-            this.ActionDispatcher = actionDispatcher;
+            ActionDispatcher = actionDispatcher;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Nito.Async
         /// <threadsafety>This method may be called by any thread at any time.</threadsafety>
         public override SynchronizationContext CreateCopy()
         {
-            return new ActionDispatcherSynchronizationContext(this.ActionDispatcher);
+            return new ActionDispatcherSynchronizationContext(ActionDispatcher);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Nito.Async
         /// <threadsafety>This method may be called by any thread at any time.</threadsafety>
         public override void Post(SendOrPostCallback d, object state)
         {
-            this.ActionDispatcher.QueueAction(() => d(state));
+            ActionDispatcher.QueueAction(() => d(state));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Nito.Async
         {
             using (ManualResetEvent evt = new ManualResetEvent(false))
             {
-                this.ActionDispatcher.QueueAction(() => { d(state); evt.Set(); });
+                ActionDispatcher.QueueAction(() => { d(state); evt.Set(); });
                 evt.WaitOne();
             }
         }

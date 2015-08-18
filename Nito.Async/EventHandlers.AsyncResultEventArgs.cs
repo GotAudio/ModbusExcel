@@ -57,7 +57,7 @@ namespace Nito.Async
             get
             {
                 RaiseExceptionIfNecessary();
-                return this.result;
+                return result;
             }
         }
     }

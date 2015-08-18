@@ -1,7 +1,4 @@
-﻿using System.Reflection;
-using ModbusExcel;
-using System;
-using System.Net.Sockets;
+﻿using System;
 using NUnit.Framework;
 
 namespace ModbusExcel.Tests

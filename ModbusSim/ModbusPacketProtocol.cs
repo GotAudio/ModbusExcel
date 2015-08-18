@@ -42,7 +42,7 @@ namespace ModbusSim
         /// <param name="socket">The socket used for communication.</param>
         public ModbusPacketProtocols(IAsyncTcpConnection socket)
         {
-            this.Socket = socket;
+            Socket = socket;
 //            this.lengthBuffer = new byte[sizeof(int)];
         }
 

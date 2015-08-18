@@ -1,5 +1,4 @@
-﻿using ModbusExcel;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace ModbusExcel.Tests
 {

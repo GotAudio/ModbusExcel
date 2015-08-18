@@ -33,15 +33,15 @@ namespace Nito.Async
         public GenericSynchronizingObject()
         {
             // (This method is always invoked from a SynchronizationContext thread)
-            this.synchronizationContext = SynchronizationContext.Current;
-            if (this.synchronizationContext == null)
+            synchronizationContext = SynchronizationContext.Current;
+            if (synchronizationContext == null)
             {
-                this.synchronizationContext = new SynchronizationContext();
+                synchronizationContext = new SynchronizationContext();
             }
 
-            if ((SynchronizationContextRegister.Lookup(this.synchronizationContext.GetType()) & SynchronizationContextProperties.SpecificAssociatedThread) == SynchronizationContextProperties.SpecificAssociatedThread)
+            if ((SynchronizationContextRegister.Lookup(synchronizationContext.GetType()) & SynchronizationContextProperties.SpecificAssociatedThread) == SynchronizationContextProperties.SpecificAssociatedThread)
             {
-                this.synchronizationContextThreadId = Thread.CurrentThread.ManagedThreadId;
+                synchronizationContextThreadId = Thread.CurrentThread.ManagedThreadId;
             }
         }
 
@@ -55,9 +55,9 @@ namespace Nito.Async
         {
             get
             {
-                if (this.synchronizationContextThreadId != null)
+                if (synchronizationContextThreadId != null)
                 {
-                    return this.synchronizationContextThreadId != Thread.CurrentThread.ManagedThreadId;
+                    return synchronizationContextThreadId != Thread.CurrentThread.ManagedThreadId;
                 }
 
                 // Unfortunately, there is no way to determine InvokeRequired for contexts without specific associated threads.
@@ -82,7 +82,7 @@ namespace Nito.Async
             IAsyncResult ret = new AsyncResult();
 
             // (The delegate passed to Post will run in the thread chosen by the SynchronizationContext)
-            this.synchronizationContext.Post(
+            synchronizationContext.Post(
                 (SendOrPostCallback)delegate(object state)
                 {
                     AsyncResult result = (AsyncResult)state;
@@ -136,7 +136,7 @@ namespace Nito.Async
         {
             // (This method may be invoked from any thread)
             ReturnValue ret = new ReturnValue();
-            this.synchronizationContext.Send(
+            synchronizationContext.Send(
                 delegate(object unusedState)
                 {
                     try
@@ -238,17 +238,17 @@ namespace Nito.Async
             {
                 get
                 {
-                    lock (this.syncObject)
+                    lock (syncObject)
                     {
                         // If it already exists, return it
-                        if (this.asyncWaitHandle != null)
+                        if (asyncWaitHandle != null)
                         {
-                            return this.asyncWaitHandle;
+                            return asyncWaitHandle;
                         }
 
                         // Create a new one
-                        this.asyncWaitHandle = new ManualResetEvent(this.isCompleted);
-                        return this.asyncWaitHandle;
+                        asyncWaitHandle = new ManualResetEvent(isCompleted);
+                        return asyncWaitHandle;
                     }
                 }
             }
@@ -274,9 +274,9 @@ namespace Nito.Async
             {
                 get
                 {
-                    lock (this.syncObject)
+                    lock (syncObject)
                     {
-                        return this.isCompleted;
+                        return isCompleted;
                     }
                 }
             }
@@ -289,14 +289,14 @@ namespace Nito.Async
             /// </remarks>
             public void Done()
             {
-                lock (this.syncObject)
+                lock (syncObject)
                 {
-                    this.isCompleted = true;
+                    isCompleted = true;
 
                     // Set the wait handle, only if necessary
-                    if (this.asyncWaitHandle != null)
+                    if (asyncWaitHandle != null)
                     {
-                        this.asyncWaitHandle.Set();
+                        asyncWaitHandle.Set();
                     }
                 }
             }
@@ -310,15 +310,15 @@ namespace Nito.Async
             public void WaitForAndDispose()
             {
                 // First, do a simple check to see if it's completed
-                if (this.IsCompleted)
+                if (IsCompleted)
                 {
                     // Ensure the underlying wait handle is disposed if necessary
-                    lock (this.syncObject)
+                    lock (syncObject)
                     {
-                        if (this.asyncWaitHandle != null)
+                        if (asyncWaitHandle != null)
                         {
-                            this.asyncWaitHandle.Close();
-                            this.asyncWaitHandle = null;
+                            asyncWaitHandle.Close();
+                            asyncWaitHandle = null;
                         }
                     }
 
@@ -326,13 +326,13 @@ namespace Nito.Async
                 }
 
                 // Wait for the signal that it's completed, creating the signal if necessary
-                this.AsyncWaitHandle.WaitOne();
+                AsyncWaitHandle.WaitOne();
 
                 // Now that it's completed, dispose of the underlying wait handle
-                lock (this.syncObject)
+                lock (syncObject)
                 {
-                    this.asyncWaitHandle.Close();
-                    this.asyncWaitHandle = null;
+                    asyncWaitHandle.Close();
+                    asyncWaitHandle = null;
                 }
             }
         }

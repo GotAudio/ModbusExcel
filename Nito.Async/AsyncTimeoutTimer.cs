@@ -40,10 +40,10 @@ namespace Nito.Async
         /// </summary>
         public AsyncTimeoutTimer()
         {
-            this.timer = new System.Timers.Timer();
-            this.timer.AutoReset = false;
-            this.timer.SynchronizingObject = new GenericSynchronizingObject();
-            this.context = new CallbackContext();
+            timer = new System.Timers.Timer();
+            timer.AutoReset = false;
+            timer.SynchronizingObject = new GenericSynchronizingObject();
+            context = new CallbackContext();
         }
 
         /// <summary>
@@ -60,9 +60,9 @@ namespace Nito.Async
         public void Dispose()
         {
             // Make sure no one gets a surprise notification. :)
-            this.Cancel();
-            this.context.Dispose();
-            this.timer.Dispose();
+            Cancel();
+            context.Dispose();
+            timer.Dispose();
         }
 
         /// <summary>
@@ -75,17 +75,17 @@ namespace Nito.Async
         public void Set(TimeSpan when)
         {
             // Cancel any pending notifications.
-            this.Cancel();
+            Cancel();
 
             // Set the timer for the requested interval.
-            this.timer.Interval = when.TotalMilliseconds;
+            timer.Interval = when.TotalMilliseconds;
 
             // Add the callback to the timer with the current context.
-            this.timerElapsedHandler = (sender, e) => this.context.Bind(this.TimerElapsed);
-            this.timer.Elapsed += this.timerElapsedHandler;
+            timerElapsedHandler = (sender, e) => context.Bind(TimerElapsed);
+            timer.Elapsed += timerElapsedHandler;
 
             // Start the timer.
-            this.timer.Start();
+            timer.Start();
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Nito.Async
         /// </summary>
         public void Reset()
         {
-            this.Set(TimeSpan.FromMilliseconds(this.timer.Interval));
+            Set(TimeSpan.FromMilliseconds(timer.Interval));
         }
 
         /// <summary>
@@ -107,19 +107,19 @@ namespace Nito.Async
         {
             // Do nothing if the timer isn't running. Note that "Timer.Enabled" cannot be used to check this because it is possible that the
             //  timer callback has been queued and Timer.Enabled has been set to false.
-            if (this.context.Invalidated)
+            if (context.Invalidated)
             {
                 return;
             }
 
             // Stop the underlying timer.
-            this.timer.Stop();
+            timer.Stop();
 
             // Remove the callback, which hasn't run yet. It may be queued, but TimerElapsed handles that situation.
-            this.timer.Elapsed -= this.timerElapsedHandler;
+            timer.Elapsed -= timerElapsedHandler;
 
             // Reset the context object; this enables TimerElapsed to detect it shouldn't run.
-            this.context.Reset();
+            context.Reset();
         }
 
         /// <summary>
@@ -128,12 +128,12 @@ namespace Nito.Async
         private void TimerElapsed()
         {
             // Remove this callback from the timer, so that if the user sets the timeout, we won't end up with a duplicate entry.
-            this.timer.Elapsed -= this.timerElapsedHandler;
+            timer.Elapsed -= timerElapsedHandler;
 
             // Invoke the user-supplied callback, if any.
-            if (this.Timeout != null)
+            if (Timeout != null)
             {
-                this.Timeout();
+                Timeout();
             }
         }
     }

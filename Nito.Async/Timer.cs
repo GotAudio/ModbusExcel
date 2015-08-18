@@ -77,17 +77,17 @@ namespace Nito.Async
         public Timer()
         {
             // Capture the synchronization context
-            this.synchronizationContext = SynchronizationContext.Current;
-            if (this.synchronizationContext == null)
+            synchronizationContext = SynchronizationContext.Current;
+            if (synchronizationContext == null)
             {
-                this.synchronizationContext = new SynchronizationContext();
+                synchronizationContext = new SynchronizationContext();
             }
 
             // Verify that the synchronization context is synchronized
-            SynchronizationContextRegister.Verify(this.synchronizationContext.GetType(), SynchronizationContextProperties.Synchronized);
+            SynchronizationContextRegister.Verify(synchronizationContext.GetType(), SynchronizationContextProperties.Synchronized);
 
             // Create the context for timer callbacks
-            this.context = new CallbackContext();
+            context = new CallbackContext();
         }
 
         /// <summary>
@@ -122,27 +122,27 @@ namespace Nito.Async
         {
             get
             {
-                if (this.inElapsed)
+                if (inElapsed)
                 {
-                    return this.enabledAfterElapsed;
+                    return enabledAfterElapsed;
                 }
                 else
                 {
-                    return this.timer != null;
+                    return timer != null;
                 }
             }
 
             set
             {
                 // If we are in the callback, just save the value and return (it will be applied after the callback returns)
-                if (this.inElapsed)
+                if (inElapsed)
                 {
-                    this.enabledAfterElapsed = value;
+                    enabledAfterElapsed = value;
                     return;
                 }
 
                 // Do nothing if enabling an already-enabled timer, or disabling an already-disabled timer.
-                if (this.Enabled == value)
+                if (Enabled == value)
                 {
                     return;
                 }
@@ -152,25 +152,25 @@ namespace Nito.Async
                     // Start the timer
 
                     // Bind the callback to our context and synchronization context
-                    Action boundOnTimer = this.context.AsyncBind(this.OnTimer, this.synchronizationContext, false);
+                    Action boundOnTimer = context.AsyncBind(OnTimer, synchronizationContext, false);
 
                     // The underlying timer delegate (raised on a ThreadPool thread) will first synchronize with the original thread
                     //  using the captured SynchronizationContext. Then it will determine if its binding is still valid and call OnTimer
                     //  if it's OK. OnTimer only handles the user callback logic.
-                    this.timer = new System.Threading.Timer((state) => boundOnTimer(), null, this.interval, TimeSpan.FromMilliseconds(-1));
+                    timer = new System.Threading.Timer((state) => boundOnTimer(), null, interval, TimeSpan.FromMilliseconds(-1));
 
                     // Inform the synchronization context that there is an active asynchronous operation
-                    this.synchronizationContext.OperationStarted();
+                    synchronizationContext.OperationStarted();
                 }
                 else
                 {
                     // Stop the underlying timer
-                    this.context.Reset();
-                    this.timer.Dispose();
-                    this.timer = null;
+                    context.Reset();
+                    timer.Dispose();
+                    timer = null;
 
                     // Inform the synchronization context that the asynchronous operation has completed
-                    this.synchronizationContext.OperationCompleted();
+                    synchronizationContext.OperationCompleted();
                 }
             }
         }
@@ -204,36 +204,36 @@ namespace Nito.Async
         {
             get
             {
-                if (this.inElapsed)
+                if (inElapsed)
                 {
-                    return this.intervalAfterElapsed;
+                    return intervalAfterElapsed;
                 }
                 else
                 {
-                    return this.interval;
+                    return interval;
                 }
             }
 
             set
             {
                 // If we are in the callback, just save the value and return (it will be applied after the callback returns)
-                if (this.inElapsed)
+                if (inElapsed)
                 {
-                    this.intervalAfterElapsed = value;
+                    intervalAfterElapsed = value;
                     return;
                 }
 
                 // If the timer is already running, then stop it, set the time, and restart it.
-                if (this.Enabled)
+                if (Enabled)
                 {
-                    this.Enabled = false;
-                    this.interval = value;
-                    this.Enabled = true;
+                    Enabled = false;
+                    interval = value;
+                    Enabled = true;
                     return;
                 }
 
                 // The timer is not already running, so we can just directly set the value.
-                this.interval = value;
+                interval = value;
             }
         }
 
@@ -253,10 +253,10 @@ namespace Nito.Async
         public void SetSingleShot(TimeSpan interval)
         {
             // Only public properties are used here to allow this function to be called from Elapsed
-            this.Enabled = false;
-            this.AutoReset = false;
-            this.Interval = interval;
-            this.Enabled = true;
+            Enabled = false;
+            AutoReset = false;
+            Interval = interval;
+            Enabled = true;
         }
 
         /// <summary>
@@ -284,10 +284,10 @@ namespace Nito.Async
         public void SetPeriodic(TimeSpan period)
         {
             // Only public properties are used here to allow this function to be called from Elapsed
-            this.Enabled = false;
-            this.AutoReset = true;
-            this.Interval = period;
-            this.Enabled = true;
+            Enabled = false;
+            AutoReset = true;
+            Interval = period;
+            Enabled = true;
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace Nito.Async
         public void Cancel()
         {
             // Only public properties are used here to allow this function to be called from Elapsed
-            this.Enabled = false;
+            Enabled = false;
         }
 
         /// <summary>
@@ -326,8 +326,8 @@ namespace Nito.Async
         /// </example>
         public void Dispose()
         {
-            this.Enabled = false;
-            this.context.Dispose();
+            Enabled = false;
+            context.Dispose();
         }
 
         /// <summary>
@@ -349,8 +349,8 @@ namespace Nito.Async
         /// </example>
         public void Restart()
         {
-            this.Enabled = false;
-            this.Enabled = true;
+            Enabled = false;
+            Enabled = true;
         }
 
         /// <summary>
@@ -361,38 +361,38 @@ namespace Nito.Async
             // When this is called, we have already been synchronized with the original thread and our context is valid (see Enabled.set() for details).
 
             // Copy properties for use from within the callback; these are the "default values"
-            this.enabledAfterElapsed = this.AutoReset;
-            this.intervalAfterElapsed = this.interval;
+            enabledAfterElapsed = AutoReset;
+            intervalAfterElapsed = interval;
 
             // Set the flag indicating we're in the callback
-            this.inElapsed = true;
+            inElapsed = true;
 
             // Call the callback
             try
             {
-                if (this.Elapsed != null)
+                if (Elapsed != null)
                 {
-                    this.Elapsed();
+                    Elapsed();
                 }
             }
             finally
             {
                 // Reset "in callback" flag
-                this.inElapsed = false;
+                inElapsed = false;
 
                 // Apply all variables that may have been set in the callback
-                this.interval = this.intervalAfterElapsed;
-                if (!this.enabledAfterElapsed)
+                interval = intervalAfterElapsed;
+                if (!enabledAfterElapsed)
                 {
                     // Destroy the underlying timer
-                    this.timer.Dispose();
-                    this.timer = null;
+                    timer.Dispose();
+                    timer = null;
                 }
                 else
                 {
                     // Since the timer is enabled (either single-shot or periodic, we don't care), and since it has already elapsed, we can just
                     //  re-use the underlying timer object and context instead of re-creating them at this point.
-                    this.timer.Change(this.interval, TimeSpan.FromMilliseconds(-1));
+                    timer.Change(interval, TimeSpan.FromMilliseconds(-1));
                 }
             }
         }

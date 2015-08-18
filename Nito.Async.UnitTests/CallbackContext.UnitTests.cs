@@ -1,11 +1,9 @@
 ﻿using Nito.Async;
 using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 using System.ComponentModel;
+using UnitTests.Util;
 
 namespace UnitTests
 {
@@ -155,7 +153,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnPost = () => { sawSync = true; },
                     OnSend = () => { sawSync = true; }
@@ -181,7 +179,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnOperationStarted = () => { sawOperationStarted = true; }
                 };
@@ -206,7 +204,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnOperationCompleted = () => { sawOperationCompleted = true; }
                 };
@@ -252,7 +250,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext and signal this thread when it's captured.
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnPost = () => { sawSync = true; },
                     OnSend = () => { sawSync = true; }
@@ -300,7 +298,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnPost = () => { sawSync = true; },
                     OnSend = () => { sawSync = true; }
@@ -327,7 +325,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnOperationStarted = () => { sawOperationStarted = true; }
                 };
@@ -353,7 +351,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnOperationCompleted = () => { sawOperationCompleted = true; }
                 };
@@ -401,7 +399,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext and signal this thread when it's captured.
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnPost = () => { sawSync = true; },
                     OnSend = () => { sawSync = true; }
@@ -726,7 +724,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnPost = () => { sawSync = true; },
                     OnSend = () => { sawSync = true; }
@@ -752,7 +750,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnOperationStarted = () => { sawOperationStarted = true; }
                 };
@@ -777,7 +775,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnOperationCompleted = () => { sawOperationCompleted = true; }
                 };
@@ -823,7 +821,7 @@ namespace UnitTests
                 // Capture the thread's SynchronizationContext and signal this thread when it's captured.
                 SynchronizationContext actionThreadSyncContext = thread.DoGet(() => { return SynchronizationContext.Current; });
 
-                var syncContext = new Util.LoggingSynchronizationContext(actionThreadSyncContext)
+                var syncContext = new LoggingSynchronizationContext(actionThreadSyncContext)
                 {
                     OnPost = () => { sawSync = true; },
                     OnSend = () => { sawSync = true; }
@@ -1042,28 +1040,28 @@ namespace UnitTests
 
             public IAsyncResult BeginInvoke(Delegate method, object[] args)
             {
-                this.sawInvoke = true;
-                this.action = () => method.DynamicInvoke(args);
-                return this.action.BeginInvoke(null, null);
+                sawInvoke = true;
+                action = () => method.DynamicInvoke(args);
+                return action.BeginInvoke(null, null);
             }
 
             public object EndInvoke(IAsyncResult result)
             {
-                this.action.EndInvoke(result);
+                action.EndInvoke(result);
                 return null;
             }
 
             public object Invoke(Delegate method, object[] args)
             {
-                this.sawInvoke = true;
-                this.action = () => method.DynamicInvoke(args);
-                this.action.EndInvoke(this.action.BeginInvoke(null, null));
+                sawInvoke = true;
+                action = () => method.DynamicInvoke(args);
+                action.EndInvoke(action.BeginInvoke(null, null));
                 return null;
             }
 
             public bool InvokeRequired
             {
-                get { return this.invokeRequired; }
+                get { return invokeRequired; }
             }
         }
 
@@ -1082,26 +1080,26 @@ namespace UnitTests
 
             public IAsyncResult BeginInvoke(Delegate method, object[] args)
             {
-                this.sawInvoke = true;
-                this.action = () => method.DynamicInvoke(args);
-                return this.action.BeginInvoke(null, null);
+                sawInvoke = true;
+                action = () => method.DynamicInvoke(args);
+                return action.BeginInvoke(null, null);
             }
 
             public object EndInvoke(IAsyncResult result)
             {
-                return this.action.EndInvoke(result);
+                return action.EndInvoke(result);
             }
 
             public object Invoke(Delegate method, object[] args)
             {
-                this.sawInvoke = true;
-                this.action = () => method.DynamicInvoke(args);
-                return this.action.EndInvoke(this.action.BeginInvoke(null, null));
+                sawInvoke = true;
+                action = () => method.DynamicInvoke(args);
+                return action.EndInvoke(action.BeginInvoke(null, null));
             }
 
             public bool InvokeRequired
             {
-                get { return this.invokeRequired; }
+                get { return invokeRequired; }
             }
         }
     }

@@ -48,8 +48,8 @@ namespace Nito.Async
         /// </example>
         public ActionThread()
         {
-            this.dispatcher = new ActionDispatcher();
-            this.thread = new Thread(() => this.dispatcher.Run());
+            dispatcher = new ActionDispatcher();
+            thread = new Thread(() => dispatcher.Run());
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Nito.Async
         /// </example>
         public bool IsAlive
         {
-            get { return this.thread.IsAlive; }
+            get { return thread.IsAlive; }
         }
 
         /// <summary>
@@ -77,8 +77,8 @@ namespace Nito.Async
         /// </example>
         public bool IsBackground
         {
-            get { return this.thread.IsBackground; }
-            set { this.thread.IsBackground = value; }
+            get { return thread.IsBackground; }
+            set { thread.IsBackground = value; }
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Nito.Async
         /// </summary>
         public int ManagedThreadId
         {
-            get { return this.thread.ManagedThreadId; }
+            get { return thread.ManagedThreadId; }
         }
 
         /// <summary>
@@ -100,9 +100,9 @@ namespace Nito.Async
         /// </example>
         public string Name
         {
-            get { return this.thread.Name; }
+            get { return thread.Name; }
 
-            set { this.thread.Name = value; }
+            set { thread.Name = value; }
         }
 
         /// <summary>
@@ -113,8 +113,8 @@ namespace Nito.Async
         /// </remarks>
         public ThreadPriority Priority
         {
-            get { return this.thread.Priority; }
-            set { this.thread.Priority = value; }
+            get { return thread.Priority; }
+            set { thread.Priority = value; }
         }
 
         /// <summary>
@@ -135,10 +135,10 @@ namespace Nito.Async
         /// </example>
         public bool Join(TimeSpan timeout)
         {
-            if (this.IsAlive)
+            if (IsAlive)
             {
-                this.dispatcher.QueueExit();
-                return this.thread.Join(timeout);
+                dispatcher.QueueExit();
+                return thread.Join(timeout);
             }
             else
             {
@@ -157,10 +157,10 @@ namespace Nito.Async
         /// </example>
         public void Join()
         {
-            if (this.IsAlive)
+            if (IsAlive)
             {
-                this.dispatcher.QueueExit();
-                this.thread.Join();
+                dispatcher.QueueExit();
+                thread.Join();
             }
         }
 
@@ -175,12 +175,12 @@ namespace Nito.Async
         /// </example>
         public void Start()
         {
-            if (this.Name == null)
+            if (Name == null)
             {
-                this.Name = "Nito.Async.ActionThread";
+                Name = "Nito.Async.ActionThread";
             }
 
-            this.thread.Start();
+            thread.Start();
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace Nito.Async
         /// </example>
         public void Do(Action action)
         {
-            this.dispatcher.QueueAction(action);
+            dispatcher.QueueAction(action);
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Nito.Async
         {
             using (ManualResetEvent evt = new ManualResetEvent(false))
             {
-                this.dispatcher.QueueAction(() => { action(); evt.Set(); });
+                dispatcher.QueueAction(() => { action(); evt.Set(); });
                 return evt.WaitOne(timeout);
             }
         }
@@ -244,13 +244,13 @@ namespace Nito.Async
         public void DoSynchronously(Action action)
         {
             // This test actually has a race condition; it's not possible to fully detect all conditions
-            if (this.thread.ThreadState == ThreadState.Unstarted || this.thread.ThreadState == ThreadState.Stopped)
+            if (thread.ThreadState == ThreadState.Unstarted || thread.ThreadState == ThreadState.Stopped)
             {
                 // If we went ahead and queued the work, it probably would result in a deadlock
                 throw new ThreadStateException("ActionThread.DoSynchronously can only queue work to a running thread.");
             }
 
-            this.DoSynchronously(action, TimeSpan.FromMilliseconds(-1));
+            DoSynchronously(action, TimeSpan.FromMilliseconds(-1));
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace Nito.Async
         public T DoGet<T>(Func<T> action)
         {
             T ret = default(T);
-            this.DoSynchronously(() => { ret = action(); }, TimeSpan.FromMilliseconds(-1));
+            DoSynchronously(() => { ret = action(); }, TimeSpan.FromMilliseconds(-1));
             return ret;
         }
 
@@ -285,8 +285,8 @@ namespace Nito.Async
         /// </example>
         public void Dispose()
         {
-            this.Join();
-            this.dispatcher.Dispose();
+            Join();
+            dispatcher.Dispose();
         }
     }
 }

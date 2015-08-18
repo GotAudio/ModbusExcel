@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
 using System.Net;
-using System.Timers;
 using System.Net.Sockets;
 
 // Copyright 2009 by Nito Programs.
