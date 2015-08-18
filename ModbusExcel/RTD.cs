@@ -135,6 +135,11 @@ namespace ModbusExcel
 
         #region Nested type: CfgInfo
 
+        enum ConnectionType
+        {
+            PerRegister,
+            PerDevice
+        }
         /// <summary>
         ///   Stores user configurable values for poller.  Even though the client (Excel) may initalize these values, they may
         ///   not get assigned before other data collection topics have been registered and polling has potentially started, so we assign 
@@ -291,6 +296,7 @@ namespace ModbusExcel
 
             public static int SimulateValue = 0;
 
+            public static ConnectionType ConnectionType;
 
         }
 
@@ -637,20 +643,31 @@ namespace ModbusExcel
                 // TODO: 8-10-15 Union is not efficient. All connection types will be the same so figure out what it is and only run the Linq for the needed one.
                 // Some dead-code dated 10-27-13 from earlier attempts deleted. Search for and restore it as a starting point or just start over.
                 // perdevice 
-                var qd = (_sockets.Join(_topics, sd => new {ip = sd.Key}, td => new {ip = td.Key},
-                    (sd, td) => new {sd, td})
-                    .Where(
-                        @t =>
-                            @t.td.Key == @t.sd.Key && @t.sd.Value.Mbmaster.Connected &&
-                            @t.td.Value.ConnectionType == "perregister"
-                            &&
-                            ((@t.td.Value.Lastevent == EventStates.Idle &&
-                              now1 - @t.td.Value.Eventbegin > CfgInfo.PollRate) ||
-                             now1 - @t.td.Value.Eventbegin > CfgInfo.SocketTimeout) &&
-                            (@t.sd.Value.Lastevent != EventStates.New && @t.sd.Value.Lastevent != EventStates.Opening) &&
-                            (!(now1 - @t.td.Value.Eventbegin < CfgInfo.PollRate) &&
-                             (CfgInfo.PollRate != 0 || !(@t.td.Value.ReceiveCount > 0)) && CfgInfo.PollRate != -1))
-                    .Select(@t => new {entry = @t.td, socket = @t.sd.Key}));//.OrderBy(x => Guid.NewGuid());
+
+                var qd = ( CfgInfo.ConnectionType == ConnectionType.PerDevice) ?
+                    (from sd in _sockets
+                          join td in _topics on new { ip = sd.Value.Ip } equals new { ip = td.Value.Ip }
+                          where td.Value.Ip == sd.Value.Ip && sd.Value.Mbmaster.Connected && td.Value.ConnectionType == "perdevice"
+                                &&
+                                ((td.Value.Lastevent == EventStates.Idle &&
+                                  now1 - td.Value.Eventbegin > CfgInfo.PollRate) ||
+                                 now1 - td.Value.Eventbegin > CfgInfo.SocketTimeout) &&
+                                (sd.Value.Lastevent != EventStates.New && sd.Value.Lastevent != EventStates.Opening) &&
+                                (!(now1 - td.Value.Eventbegin < CfgInfo.PollRate) &&
+                                 (CfgInfo.PollRate != 0 || !(td.Value.ReceiveCount > 0)) && CfgInfo.PollRate != -1)
+                          select new { entry = td, socket = sd.Key })//.OrderBy(x => Guid.NewGuid());
+                          :
+                    ( from sd in _sockets
+                           join td in _topics on new { ip = sd.Key } equals new { ip = td.Key }
+                           where td.Key == sd.Key && sd.Value.Mbmaster.Connected && td.Value.ConnectionType == "perregister"
+                                 &&
+                                 ((td.Value.Lastevent == EventStates.Idle &&
+                                   now1 - td.Value.Eventbegin > CfgInfo.PollRate) ||
+                                  now1 - td.Value.Eventbegin > CfgInfo.SocketTimeout) &&
+                                 (sd.Value.Lastevent != EventStates.New && sd.Value.Lastevent != EventStates.Opening) &&
+                                 (!(now1 - td.Value.Eventbegin < CfgInfo.PollRate) &&
+                                  (CfgInfo.PollRate != 0 || !(td.Value.ReceiveCount > 0)) && CfgInfo.PollRate != -1)
+                           select new { entry = td, socket = sd.Key });//.OrderBy(x => Guid.NewGuid());
 
                 foreach (var r in qd)
                 {
@@ -1323,6 +1340,8 @@ namespace ModbusExcel
 
             // Special Modicon = D setting disables polling for selected device
             if (ti.Modicon == "d") return (new object[,] {{topicId}, {"0"}});
+
+            CfgInfo.ConnectionType = (ti.ConnectionType == "perdevice") ? ConnectionType.PerDevice : ConnectionType.PerRegister;
 
             string topickey = ti.Ip + "|" + ti.Addr;
             TopicInfo priorti;

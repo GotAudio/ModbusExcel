@@ -20,13 +20,13 @@ RTD server that polls Modbus TCP registers from Excel
 
 This solution contains four projects;
 
-### ModbusExcel	- RTD Server for Excel. (See ModbusExcelGuide.xls for more details)
+### ModbusExcel	- RTD Server for Excel.
 
-### ModbusSim	- Load test simulator to test performance and connectivity.
-- ModbusSim is not a fully functional ModBus server. The responses it sends are valid for the register datatype, with some customization for Omni Flow Computer registers (eg. valid ASCII and numeric Dates) It ignores UnitID so they all retuen the same result. It does support Omni RDA (Raw Data Archive 700-7nn) Method 1 request of Single read Address:Index. Method 2 (write first) is not supported. It never returns an error status.  What it does do is accept tens of thousands of simultaneous async connections and async reads. You can configure the Excel spreadsheet to use the RTD service to make a new connection for EVERY register, rather than the default of reusing one connections for all requests for a device. and then continuously read thousands of registers as fast as possible. On my PC, the RTD service is able to establish 3000 connections in 10 seconds, and make and receive 110,000 poll responses in 60 seconds using no more than 3 threads, minimal memory, and less than 10% CPU. 
+### ModbusSim	- Simulator to test performance and connectivity.
+- ModbusSim is not a fully functional ModBus server. The responses it sends are valid for the register datatype, with some customization for Omni Flow Computer registers (eg. valid ASCII and numeric Dates) It ignores UnitID so they all retuen the same result. It does support Omni RDA (Raw Data Archive 700-7nn) Method 1 request of Single read Address:Index. Method 2 (write first) is not supported. It never returns an error status.  What it does do is accept tens of thousands of simultaneous async connections and async reads. You can configure the Excel spreadsheet to use the RTD service to make a new connection for EVERY register, rather than the default of reusing one connections for all requests for a device, and then continuously read thousands of registers as fast as possible. On my PC, the RTD service is able to establish 3000 connections in 10 seconds, and make and receive 110,000 poll responses in 60 seconds using no more than 3 threads, minimal memory, and less than 10% CPU. 
 - Also for what it's worth, even though the screen looks like a grid of checkbox controls, it is actually just a bitmap image of a grid. As connections are made, and read requests are received, 3-state checkboxes appear to change. Those checkboxes are just bitmaps drawn on the screen at the appropriate locations.  This was the only way to manage to toggle thousands of checkboxes per-second, as opposed to the tens of checkbox changes per-second MSControls support.  Even now, those checkboxes add a 30% overhead to the simulator. I am working on an alternate scheme. You can uncheck "Show Events" to disable realtime connection and data indicators.
 
-### ModbusExcel.Tests	- Incomplete (skeleton) tests. TBD: Tests need to be written and converted from MSTest to Nunit.
+### ModbusExcel.Tests	- Incomplete (skeleton) tests.
 
 ### ModbusExcelConsole	- An RTD test console. ModbusSim.exe must be running for this to work.
 - Modified from; https://github.com/AJTSheppard/Andrew-Sheppard/blob/master/MyRTD/MyRTDConsole/Program.cs (Can probably be deleted after tests are complete.)
